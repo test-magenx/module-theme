@@ -74,11 +74,6 @@ class Design implements \Magento\Framework\View\DesignInterface
     protected $_appState;
 
     /**
-     * @var array
-     */
-    private $_themes;
-
-    /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\View\Design\Theme\FlyweightFactory $flyweightFactory
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig

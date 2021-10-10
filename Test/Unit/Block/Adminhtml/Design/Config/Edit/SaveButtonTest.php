@@ -17,9 +17,6 @@ class SaveButtonTest extends TestCase
      */
     protected $block;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         $this->block = new SaveButton();

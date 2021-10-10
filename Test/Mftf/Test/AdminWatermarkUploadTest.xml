@@ -10,12 +10,15 @@
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
     <test name="AdminWatermarkUploadTest">
         <annotations>
-            <features value="Theme"/>
+            <features value="Watermark"/>
             <stories value="Watermark"/>
-            <title value="Can't upload Watermark Image"/>
+            <title value="MAGETWO-95934: Can't upload Watermark Image"/>
             <description value="Watermark images should be able to be uploaded in the admin"/>
             <severity value="MAJOR"/>
-            <testCaseId value="MC-25636"/>
+            <testCaseId value="MC-5796"/>
+            <skip>
+                <issueId value="MC-18496"/>
+            </skip>
             <group value="Watermark"/>
         </annotations>
         <before>

@@ -17,7 +17,6 @@ use Magento\Framework\View\Design\Theme\Validator;
 use Magento\Theme\Model\Config\Customization;
 use Magento\Theme\Model\ResourceModel\Theme\Collection;
 use Magento\Theme\Model\Theme\Data;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,46 +29,43 @@ class DataTest extends TestCase
      */
     protected $model;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         $customizationConfig = $this->createMock(Customization::class);
-        $customizationFactory = $this->createPartialMock(
+        $this->customizationFactory = $this->createPartialMock(
             \Magento\Framework\View\Design\Theme\CustomizationFactory::class,
             ['create']
         );
-        $resourceCollection = $this->createMock(Collection::class);
-        $imageFactory = $this->createPartialMock(
+        $this->resourceCollection = $this->createMock(Collection::class);
+        $this->_imageFactory = $this->createPartialMock(
             ImageFactory::class,
             ['create']
         );
-        $themeFactory = $this->createPartialMock(
+        $this->themeFactory = $this->createPartialMock(
             FlyweightFactory::class,
             ['create']
         );
-        $domainFactory = $this->createPartialMock(
+        $this->domainFactory = $this->createPartialMock(
             Factory::class,
             ['create']
         );
-        $themeModelFactory = $this->createPartialMock(\Magento\Theme\Model\ThemeFactory::class, ['create']);
-        $validator = $this->createMock(Validator::class);
-        $appState = $this->createMock(State::class);
+        $this->themeModelFactory = $this->createPartialMock(\Magento\Theme\Model\ThemeFactory::class, ['create']);
+        $this->validator = $this->createMock(Validator::class);
+        $this->appState = $this->createMock(State::class);
 
         $objectManagerHelper = new ObjectManager($this);
         $arguments = $objectManagerHelper->getConstructArguments(
             Data::class,
             [
-                'customizationFactory' => $customizationFactory,
+                'customizationFactory' => $this->customizationFactory,
                 'customizationConfig' => $customizationConfig,
-                'imageFactory' => $imageFactory,
-                'resourceCollection' => $resourceCollection,
-                'themeFactory' => $themeFactory,
-                'domainFactory' => $domainFactory,
-                'validator' => $validator,
-                'appState' => $appState,
-                'themeModelFactory' => $themeModelFactory
+                'imageFactory' => $this->_imageFactory,
+                'resourceCollection' => $this->resourceCollection,
+                'themeFactory' => $this->themeFactory,
+                'domainFactory' => $this->domainFactory,
+                'validator' => $this->validator,
+                'appState' => $this->appState,
+                'themeModelFactory' => $this->themeModelFactory
             ]
         );
 
