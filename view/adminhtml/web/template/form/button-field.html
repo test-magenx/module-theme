@@ -9,15 +9,15 @@
      css="$data.additionalClasses"
      attr="'data-index': index">
     <label class="admin__field-label">
-        <span text="label"></span>
+        <span text="label"/>
     </label>
 
     <div class="admin__field-control"
          css="'_with-tooltip': $data.tooltip">
-        <render args="tooltipTpl" if="$data.tooltip"></render>
-        <render args="buttonTpl" ></render>
+        <render args="tooltipTpl" if="$data.tooltip"/>
+        <render args="buttonTpl" />
         <div class="admin__field-note" if="$data.notice">
-            <span text="notice"></span>
+            <span text="notice"/>
         </div>
     </div>
 </div>

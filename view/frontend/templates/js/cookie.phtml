@@ -18,7 +18,7 @@
                 "expires": null,
                 "path": "<?= $block->escapeJs($block->getPath()) ?>",
                 "domain": "<?= $block->escapeJs($block->getDomain()) ?>",
-                "secure": <?= $block->getSessionConfig()->getCookieSecure() ? 'true' : 'false'; ?>,
+                "secure": false,
                 "lifetime": "<?= $block->escapeJs($block->getLifetime()) ?>"
             }
         }

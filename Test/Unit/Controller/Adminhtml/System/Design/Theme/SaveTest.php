@@ -23,32 +23,39 @@ class SaveTest extends ThemeTest
     protected $name = 'Save';
 
     /**
-     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSaveAction(): void
+    public function testSaveAction()
     {
         $themeData = ['theme_id' => 123];
         $customCssContent = 'custom css content';
         $jsRemovedFiles = [3, 4];
         $jsOrder = [1 => '1', 2 => 'test'];
 
-        $this->_request
+        $this->_request->expects($this->at(0))
             ->method('getParam')
-            ->withConsecutive(
-                ['back', false],
-                ['theme'],
-                ['custom_css_content'],
-                ['js_removed_files'],
-                ['js_order']
-            )
-            ->willReturnOnConsecutiveCalls(
-                true,
-                $themeData,
-                $customCssContent,
-                $jsRemovedFiles,
-                $jsOrder
-            );
+            ->with('back', false)
+            ->willReturn(true);
+
+        $this->_request->expects($this->at(1))
+            ->method('getParam')
+            ->with('theme')
+            ->willReturn($themeData);
+
+        $this->_request->expects($this->at(2))
+            ->method('getParam')
+            ->with('custom_css_content')
+            ->willReturn($customCssContent);
+
+        $this->_request->expects($this->at(3))
+            ->method('getParam')
+            ->with('js_removed_files')
+            ->willReturn($jsRemovedFiles);
+
+        $this->_request->expects($this->at(4))
+            ->method('getParam')
+            ->with('js_order')
+            ->willReturn($jsOrder);
 
         $this->_request->expects($this->once())->method('getPostValue')->willReturn(true);
 
@@ -67,11 +74,17 @@ class SaveTest extends ThemeTest
         );
         $themeFactory->expects($this->once())->method('create')->willReturn($themeMock);
 
-        $this->_objectManagerMock
+        $this->_objectManagerMock->expects($this->at(0))
             ->method('get')
-            ->withConsecutive([FlyweightFactory::class], [CustomCss::class])
-            ->willReturnOnConsecutiveCalls($themeFactory, null);
-        $this->_objectManagerMock
+            ->with(FlyweightFactory::class)
+            ->willReturn($themeFactory);
+
+        $this->_objectManagerMock->expects($this->at(1))
+            ->method('get')
+            ->with(CustomCss::class)
+            ->willReturn(null);
+
+        $this->_objectManagerMock->expects($this->at(2))
             ->method('create')
             ->with(SingleFile::class)
             ->willReturn(null);

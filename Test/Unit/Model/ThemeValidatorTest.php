@@ -43,9 +43,6 @@ class ThemeValidatorTest extends TestCase
      */
     protected $configData;
 
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $this->storeManager = $this->getMockForAbstractClass(StoreManagerInterface::class);
@@ -62,10 +59,7 @@ class ThemeValidatorTest extends TestCase
         );
     }
 
-    /**
-     * @return void
-     */
-    public function testValidateIsThemeInUse(): void
+    public function testValidateIsThemeInUse()
     {
         $theme = $this->createMock(Theme::class);
         $theme->expects($this->once())->method('getId')->willReturn(6);
@@ -75,11 +69,13 @@ class ThemeValidatorTest extends TestCase
         $this->themeProvider->expects($this->once())->method('getThemeByFullPath')->willReturn($theme);
         $this->configData->expects($this->once())->method('getCollection')->willReturn($this->configData);
         $this->configData
+            ->expects($this->at(1))
             ->method('addFieldToFilter')
-            ->willReturnOnConsecutiveCalls(
-                $this->configData,
-                [$defaultEntity, $websitesEntity, $storesEntity]
-            );
+            ->willReturn($this->configData);
+        $this->configData
+            ->expects($this->at(2))
+            ->method('addFieldToFilter')
+            ->willReturn([$defaultEntity, $websitesEntity, $storesEntity]);
         $website = $this->createPartialMock(Website::class, ['getName']);
         $website->expects($this->once())->method('getName')->willReturn('websiteA');
         $store = $this->createPartialMock(Store::class, ['getName']);

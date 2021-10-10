@@ -174,8 +174,6 @@ class DownloadCustomCssTest extends TestCase
         $file->expects($this->once())
             ->method('getFullPath')
             ->willReturn($fullPath);
-        $theme->method('getId')
-            ->willReturn($themeId);
         $theme->expects($this->once())
             ->method('getCustomization')
             ->willReturn($customization);
@@ -236,7 +234,7 @@ class DownloadCustomCssTest extends TestCase
             ->with($themeId)
             ->willReturn(null);
         $this->messageManager->expects($this->once())
-            ->method('addExceptionMessage');
+            ->method('addException');
         $logger->expects($this->once())
             ->method('critical');
         $this->redirect->expects($this->once())

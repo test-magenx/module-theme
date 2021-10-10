@@ -25,18 +25,13 @@ use Psr\Log\LoggerInterface;
  */
 class EditTest extends ThemeTest
 {
-    /**
-     * @var string
-     */
+    /** @var string  */
     protected $name = 'Edit';
 
-    /**
-     * @return void
-     */
-    public function testExecuteWithoutLoadedTheme(): void
+    public function testExecuteWithoutLoadedTheme()
     {
         $themeId = 23;
-        $this->_request
+        $this->_request->expects($this->at(0))
             ->method('getParam')
             ->with('id')
             ->willReturn($themeId);
@@ -85,13 +80,10 @@ class EditTest extends ThemeTest
         $this->_model->execute();
     }
 
-    /**
-     * @return void
-     */
-    public function testExecuteWithException(): void
+    public function testExecuteWithException()
     {
         $themeId = 23;
-        $this->_request
+        $this->_request->expects($this->at(0))
             ->method('getParam')
             ->with('id')
             ->willReturn($themeId);
@@ -155,10 +147,9 @@ class EditTest extends ThemeTest
     }
 
     /**
-     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testExecute(): void
+    public function testExecute()
     {
         $themeId = 23;
 
@@ -180,7 +171,7 @@ class EditTest extends ThemeTest
         $resultPage = $this->createMock(Page::class);
         $pageConfig = $this->createMock(Config::class);
         $pageTitle = $this->createMock(Title::class);
-        $this->_request
+        $this->_request->expects($this->at(0))
             ->method('getParam')
             ->with('id')
             ->willReturn($themeId);
@@ -225,6 +216,10 @@ class EditTest extends ThemeTest
         $tab->expects($this->once())
             ->method('setFiles')
             ->with($cssAsset);
+        $layout->expects($this->at(0))
+            ->method('getBlock')
+            ->with('theme_edit_tabs_tab_css_tab')
+            ->willReturn($tab);
         $menu->expects($this->once())
             ->method('setActive')
             ->with('Magento_Theme::system_design_theme');
@@ -239,10 +234,10 @@ class EditTest extends ThemeTest
             ->method('getTitle')
             ->willReturn('Title');
 
-        $layout
+        $layout->expects($this->at(1))
             ->method('getBlock')
-            ->withConsecutive(['theme_edit_tabs_tab_css_tab'], ['menu'])
-            ->willReturnOnConsecutiveCalls($tab, $menu);
+            ->with('menu')
+            ->willReturn($menu);
         $this->view->expects($this->atLeastOnce())
             ->method('getLayout')
             ->willReturn($layout);

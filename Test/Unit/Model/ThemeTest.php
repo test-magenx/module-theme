@@ -12,7 +12,6 @@ namespace Magento\Theme\Test\Unit\Model;
 
 use Magento\Framework\App\State;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use Magento\Framework\View\Design\Theme\CustomizationFactory;
 use Magento\Framework\View\Design\Theme\CustomizationInterface;
 use Magento\Framework\View\Design\Theme\Domain\Factory;
 use Magento\Framework\View\Design\Theme\FlyweightFactory;
@@ -22,7 +21,6 @@ use Magento\Framework\View\Design\ThemeInterface;
 use Magento\Theme\Model\Config\Customization;
 use Magento\Theme\Model\ResourceModel\Theme\Collection;
 use Magento\Theme\Model\Theme;
-use Magento\Theme\Model\ThemeFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +60,7 @@ class ThemeTest extends TestCase
     protected $validator;
 
     /**
-     * @var MockObject|CustomizationFactory
+     * @var MockObject|\Magento\Framework\View\Design\Theme\CustomizationFactory
      */
     protected $customizationFactory;
 
@@ -72,18 +70,15 @@ class ThemeTest extends TestCase
     protected $appState;
 
     /**
-     * @var MockObject|ThemeFactory
+     * @var MockObject|\Magento\Theme\Model\ThemeFactory
      */
     private $themeModelFactory;
 
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $customizationConfig = $this->createMock(Customization::class);
         $this->customizationFactory = $this->createPartialMock(
-            CustomizationFactory::class,
+            \Magento\Framework\View\Design\Theme\CustomizationFactory::class,
             ['create']
         );
         $this->resourceCollection = $this->createMock(Collection::class);
@@ -99,7 +94,7 @@ class ThemeTest extends TestCase
             Factory::class,
             ['create']
         );
-        $this->themeModelFactory = $this->createPartialMock(ThemeFactory::class, ['create']);
+        $this->themeModelFactory = $this->createPartialMock(\Magento\Theme\Model\ThemeFactory::class, ['create']);
         $this->validator = $this->createMock(Validator::class);
         $this->appState = $this->createMock(State::class);
 
@@ -122,33 +117,27 @@ class ThemeTest extends TestCase
         $this->_model = $objectManagerHelper->getObject(Theme::class, $arguments);
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function tearDown(): void
     {
         $this->_model = null;
     }
 
     /**
-     * @return void
      * @covers \Magento\Theme\Model\Theme::getThemeImage
      */
-    public function testThemeImageGetter(): void
+    public function testThemeImageGetter()
     {
         $this->_imageFactory->expects($this->once())->method('create')->with(['theme' => $this->_model]);
         $this->_model->getThemeImage();
     }
 
     /**
+     * @dataProvider isVirtualDataProvider
      * @param int $type
      * @param string $isVirtual
-     *
-     * @return void
-     * @dataProvider isVirtualDataProvider
      * @covers \Magento\Theme\Model\Theme::isVirtual
      */
-    public function testIsVirtual($type, $isVirtual): void
+    public function testIsVirtual($type, $isVirtual)
     {
         $this->_model->setType($type);
         $this->assertEquals($isVirtual, $this->_model->isVirtual());
@@ -157,7 +146,7 @@ class ThemeTest extends TestCase
     /**
      * @return array
      */
-    public function isVirtualDataProvider(): array
+    public function isVirtualDataProvider()
     {
         return [
             ['type' => ThemeInterface::TYPE_VIRTUAL, 'isVirtual' => true],
@@ -167,14 +156,12 @@ class ThemeTest extends TestCase
     }
 
     /**
+     * @dataProvider isPhysicalDataProvider
      * @param int $type
      * @param string $isPhysical
-     *
-     * @return void
-     * @dataProvider isPhysicalDataProvider
      * @covers \Magento\Theme\Model\Theme::isPhysical
      */
-    public function testIsPhysical($type, $isPhysical): void
+    public function testIsPhysical($type, $isPhysical)
     {
         $this->_model->setType($type);
         $this->assertEquals($isPhysical, $this->_model->isPhysical());
@@ -183,7 +170,7 @@ class ThemeTest extends TestCase
     /**
      * @return array
      */
-    public function isPhysicalDataProvider(): array
+    public function isPhysicalDataProvider()
     {
         return [
             ['type' => ThemeInterface::TYPE_VIRTUAL, 'isPhysical' => false],
@@ -193,14 +180,12 @@ class ThemeTest extends TestCase
     }
 
     /**
+     * @dataProvider isVisibleDataProvider
      * @param int $type
      * @param string $isVisible
-     *
-     * @return void
-     * @dataProvider isVisibleDataProvider
      * @covers \Magento\Theme\Model\Theme::isVisible
      */
-    public function testIsVisible($type, $isVisible): void
+    public function testIsVisible($type, $isVisible)
     {
         $this->_model->setType($type);
         $this->assertEquals($isVisible, $this->_model->isVisible());
@@ -209,7 +194,7 @@ class ThemeTest extends TestCase
     /**
      * @return array
      */
-    public function isVisibleDataProvider(): array
+    public function isVisibleDataProvider()
     {
         return [
             ['type' => ThemeInterface::TYPE_VIRTUAL, 'isVisible' => true],
@@ -219,30 +204,28 @@ class ThemeTest extends TestCase
     }
 
     /**
-     * Test id deletable.
+     * Test id deletable
      *
+     * @dataProvider isDeletableDataProvider
      * @param string $themeType
      * @param bool $isDeletable
-     *
-     * @return void
-     * @dataProvider isDeletableDataProvider
      * @covers \Magento\Theme\Model\Theme::isDeletable
      */
-    public function testIsDeletable($themeType, $isDeletable): void
+    public function testIsDeletable($themeType, $isDeletable)
     {
         $themeModel = $this->getMockBuilder(Theme::class)
             ->addMethods(['getType'])
             ->disableOriginalConstructor()
             ->getMock();
         $themeModel->expects($this->once())->method('getType')->willReturn($themeType);
-        /** @var Theme $themeModel */
+        /** @var \Magento\Theme\Model\Theme $themeModel */
         $this->assertEquals($isDeletable, $themeModel->isDeletable());
     }
 
     /**
      * @return array
      */
-    public function isDeletableDataProvider(): array
+    public function isDeletableDataProvider()
     {
         return [
             [ThemeInterface::TYPE_VIRTUAL, true],
@@ -254,11 +237,9 @@ class ThemeTest extends TestCase
     /**
      * @param mixed $originalCode
      * @param string $expectedCode
-     *
-     * @return void
      * @dataProvider getCodeDataProvider
      */
-    public function testGetCode($originalCode, $expectedCode): void
+    public function testGetCode($originalCode, $expectedCode)
     {
         $this->_model->setCode($originalCode);
         $this->assertSame($expectedCode, $this->_model->getCode());
@@ -267,7 +248,7 @@ class ThemeTest extends TestCase
     /**
      * @return array
      */
-    public function getCodeDataProvider(): array
+    public function getCodeDataProvider()
     {
         return [
             'string code' => ['theme/code', 'theme/code'],
@@ -280,7 +261,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testGetInheritedThemes(): void
+    public function testGetInheritedThemes()
     {
         $inheritedTheme = $this->getMockBuilder(ThemeInterface::class)
             ->getMock();
@@ -302,12 +283,11 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testAfterDelete(): void
+    public function testAfterDelete()
     {
         $expectId = 101;
         $theme = $this->getMockBuilder(ThemeInterface::class)
-            ->onlyMethods(['getId'])
-            ->addMethods(['delete'])
+            ->setMethods(['delete', 'getId'])
             ->getMockForAbstractClass();
         $theme->expects($this->once())
             ->method('getId')
@@ -317,10 +297,14 @@ class ThemeTest extends TestCase
             ->willReturnSelf();
 
         $this->_model->setId(1);
-        $this->resourceCollection
+        $this->resourceCollection->expects($this->at(0))
             ->method('addFieldToFilter')
-            ->withConsecutive(['parent_id', 1], ['type', Theme::TYPE_STAGING])
-            ->willReturnOnConsecutiveCalls($this->resourceCollection, $this->resourceCollection);
+            ->with('parent_id', 1)
+            ->willReturnSelf();
+        $this->resourceCollection->expects($this->at(1))
+            ->method('addFieldToFilter')
+            ->with('type', Theme::TYPE_STAGING)
+            ->willReturnSelf();
         $this->resourceCollection->expects($this->once())
             ->method('getFirstItem')
             ->willReturn($theme);
@@ -335,20 +319,24 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testGetStagingVersion(): void
+    public function testGetStagingVersion()
     {
         $theme = $this->getMockBuilder(ThemeInterface::class)
-            ->onlyMethods(['getId'])
+            ->setMethods(['getId'])
             ->getMockForAbstractClass();
         $theme->expects($this->once())
             ->method('getId')
             ->willReturn(null);
 
         $this->_model->setId(1);
-        $this->resourceCollection
+        $this->resourceCollection->expects($this->at(0))
             ->method('addFieldToFilter')
-            ->withConsecutive(['parent_id', 1], ['type', Theme::TYPE_STAGING])
-            ->willReturnOnConsecutiveCalls($this->resourceCollection, $this->resourceCollection);
+            ->with('parent_id', 1)
+            ->willReturnSelf();
+        $this->resourceCollection->expects($this->at(1))
+            ->method('addFieldToFilter')
+            ->with('type', Theme::TYPE_STAGING)
+            ->willReturnSelf();
         $this->resourceCollection->expects($this->once())
             ->method('getFirstItem')
             ->willReturn($theme);
@@ -360,7 +348,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testGetStagingVersionWithoutTheme(): void
+    public function testGetStagingVersionWithoutTheme()
     {
         $this->assertNull($this->_model->getStagingVersion());
     }
@@ -369,7 +357,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testGetDomainModel(): void
+    public function testGetDomainModel()
     {
         $result = 'res';
         $this->domainFactory->expects($this->once())
@@ -383,7 +371,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testGetDomainModelWithIncorrectType(): void
+    public function testGetDomainModelWithIncorrectType()
     {
         $this->expectException('InvalidArgumentException');
         $this->_model->getDomainModel('bla-bla-bla');
@@ -393,7 +381,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testValidate(): void
+    public function testValidate()
     {
         $this->expectException('Magento\Framework\Exception\LocalizedException');
         $this->expectExceptionMessage('testMessage');
@@ -411,7 +399,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testValidatePass(): void
+    public function testValidatePass()
     {
         $this->validator->expects($this->once())
             ->method('validate')
@@ -424,7 +412,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testHasChildThemes(): void
+    public function testHasChildThemes()
     {
         $this->_model->setId(1);
         $this->resourceCollection->expects($this->once())
@@ -445,7 +433,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testGetCustomization(): void
+    public function testGetCustomization()
     {
         $this->customizationFactory->expects($this->once())
             ->method('create')
@@ -463,7 +451,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function testIsEditable(): void
+    public function testIsEditable()
     {
         $this->_model->setType(Theme::TYPE_VIRTUAL);
         $this->assertTrue($this->_model->isEditable());
@@ -475,7 +463,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function getFullThemePath(): void
+    public function getFullThemePath()
     {
         $areaCode = 'frontend';
         $this->appState->expects($this->once())
@@ -492,7 +480,7 @@ class ThemeTest extends TestCase
      * @test
      * @return void
      */
-    public function getParentTheme(): void
+    public function getParentTheme()
     {
         $this->_model->setParentTheme('parent_theme');
         $this->assertEquals('parent_theme', $this->_model->getParentTheme());
@@ -501,11 +489,9 @@ class ThemeTest extends TestCase
     /**
      * @param array $themeData
      * @param array $expected
-     *
-     * @return void
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $themeData, array $expected): void
+    public function testToArray(array $themeData, array $expected)
     {
         $this->_model->setData($themeData);
         $this->assertEquals($expected, $this->_model->toArray());
@@ -514,7 +500,7 @@ class ThemeTest extends TestCase
     /**
      * @return array
      */
-    public function toArrayDataProvider(): array
+    public function toArrayDataProvider()
     {
         $parentTheme = $this->getMockBuilder(Theme::class)
             ->disableOriginalConstructor()
@@ -569,10 +555,9 @@ class ThemeTest extends TestCase
      * @param array $expected
      * @param int $expectedCallCount
      *
-     * @return void
      * @dataProvider populateFromArrayDataProvider
      */
-    public function testPopulateFromArray(array $value, array $expected, int $expectedCallCount = 0): void
+    public function testPopulateFromArray(array $value, array $expected, $expectedCallCount = 0)
     {
         $themeMock = $this->getMockBuilder(Theme::class)
             ->disableOriginalConstructor()
@@ -592,7 +577,7 @@ class ThemeTest extends TestCase
     /**
      * @return array
      */
-    public function populateFromArrayDataProvider(): array
+    public function populateFromArrayDataProvider()
     {
         return [
             'valid data' => [

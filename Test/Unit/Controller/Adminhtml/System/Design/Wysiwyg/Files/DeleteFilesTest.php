@@ -14,41 +14,27 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Theme\Controller\Adminhtml\System\Design\Wysiwyg\Files;
 use Magento\Theme\Controller\Adminhtml\System\Design\Wysiwyg\Files\DeleteFiles;
-use Magento\Theme\Helper\Storage;
 use Magento\Theme\Model\Wysiwyg\Storage as WisiwygStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DeleteFilesTest extends TestCase
 {
-    /**
-     * @var Files
-     */
+    /** @var Files */
     protected $controller;
 
-    /**
-     * @var MockObject|MockObject
-     */
+    /** @var MockObject|MockObject*/
     protected $objectManager;
 
-    /**
-     * @var Storage|MockObject
-     */
+    /** @var \Magento\Theme\Helper\Storage|MockObject */
     protected $storage;
 
-    /**
-     * @var RequestInterface|MockObject
-     */
+    /** @var RequestInterface|MockObject */
     protected $request;
 
-    /**
-     * @var Http|MockObject
-     */
+    /** @var Http|MockObject */
     protected $response;
 
-    /**
-     * @inheritdoc
-     */
     protected function setUp(): void
     {
         $this->objectManager = $this->getMockForAbstractClass(ObjectManagerInterface::class);
@@ -70,15 +56,12 @@ class DeleteFilesTest extends TestCase
             [
                 'objectManager' => $this->objectManager,
                 'request' => $this->request,
-                'response' => $this->response
+                'response' => $this->response,
             ]
         );
     }
 
-    /**
-     * @return void
-     */
-    public function testExecuteWithWrongRequest(): void
+    public function testExecuteWithWrongRequest()
     {
         $this->request->expects($this->once())
             ->method('isPost')
@@ -102,10 +85,7 @@ class DeleteFilesTest extends TestCase
         $this->controller->execute();
     }
 
-    /**
-     * @return void
-     */
-    public function testExecute(): void
+    public function testExecute()
     {
         $this->request->expects($this->once())
             ->method('isPost')
@@ -120,10 +100,14 @@ class DeleteFilesTest extends TestCase
             ->method('jsonDecode')
             ->with('{"files":"file"}')
             ->willReturn(['files' => 'file']);
-        $this->objectManager
+        $this->objectManager->expects($this->at(0))
             ->method('get')
-            ->withConsecutive([Data::class], [WisiwygStorage::class])
-            ->willReturnOnConsecutiveCalls($jsonData, $this->storage);
+            ->with(Data::class)
+            ->willReturn($jsonData);
+        $this->objectManager->expects($this->at(1))
+            ->method('get')
+            ->with(WisiwygStorage::class)
+            ->willReturn($this->storage);
         $this->storage->expects($this->once())
             ->method('deleteFile')
             ->with('file');

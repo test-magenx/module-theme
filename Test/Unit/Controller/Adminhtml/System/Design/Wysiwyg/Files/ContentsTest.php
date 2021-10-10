@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Magento\Theme\Test\Unit\Controller\Adminhtml\System\Design\Wysiwyg\Files;
 
-use Exception;
 use Magento\Backend\Model\Session;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\App\ViewInterface;
@@ -19,7 +18,6 @@ use Magento\Framework\View\LayoutInterface;
 use Magento\Theme\Controller\Adminhtml\System\Design\Wysiwyg\Files;
 use Magento\Theme\Controller\Adminhtml\System\Design\Wysiwyg\Files\Contents;
 use Magento\Theme\Helper\Storage;
-use Magento\Theme\Model\Wysiwyg\Storage as WysiwygStorage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -28,39 +26,24 @@ use PHPUnit\Framework\TestCase;
  */
 class ContentsTest extends TestCase
 {
-    /**
-     * @var Files
-     */
+    /** @var Files */
     protected $controller;
 
-    /**
-     * @var ViewInterface|MockObject
-     */
+    /** @var ViewInterface|MockObject */
     protected $view;
 
-    /**
-     * @var MockObject|MockObject
-     */
+    /** @var MockObject|MockObject*/
     protected $objectManager;
 
-    /**
-     * @var Session|MockObject
-     */
+    /** @var Session|MockObject */
     protected $session;
 
-    /**
-     * @var Http|MockObject
-     */
+    /** @var Http|MockObject */
     protected $response;
 
-    /**
-     * @var Storage|MockObject
-     */
+    /** @var Storage|MockObject */
     protected $storage;
 
-    /**
-     * @inheirtDoc
-     */
     protected function setUp(): void
     {
         $this->view = $this->getMockForAbstractClass(ViewInterface::class);
@@ -82,13 +65,10 @@ class ContentsTest extends TestCase
         );
     }
 
-    /**
-     * @return void
-     */
-    public function testExecute(): void
+    public function testExecute()
     {
         $layout = $this->getMockForAbstractClass(LayoutInterface::class, [], '', false);
-        $storage = $this->createMock(WysiwygStorage::class);
+        $storage = $this->createMock(\Magento\Theme\Model\Wysiwyg\Storage::class);
         $block = $this->getMockForAbstractClass(
             BlockInterface::class,
             [],
@@ -112,9 +92,13 @@ class ContentsTest extends TestCase
         $block->expects($this->once())
             ->method('setStorage')
             ->with($storage);
+        $this->objectManager->expects($this->at(0))
+            ->method('get')
+            ->with(\Magento\Theme\Model\Wysiwyg\Storage::class)
+            ->willReturn($storage);
         $this->storage->expects($this->once())
             ->method('getCurrentPath')
-            ->willThrowException(new Exception('Message'));
+            ->willThrowException(new \Exception('Message'));
 
         $jsonData = $this->createMock(Data::class);
         $jsonData->expects($this->once())
@@ -122,10 +106,10 @@ class ContentsTest extends TestCase
             ->with(['error' => true, 'message' => 'Message'])
             ->willReturn('{"error":"true","message":"Message"}');
 
-        $this->objectManager
+        $this->objectManager->expects($this->at(1))
             ->method('get')
-            ->withConsecutive([WysiwygStorage::class], [Data::class])
-            ->willReturnOnConsecutiveCalls($storage, $jsonData);
+            ->with(Data::class)
+            ->willReturn($jsonData);
 
         $this->response->expects($this->once())
             ->method('representJson');

@@ -52,7 +52,7 @@ class FaviconTest extends TestCase
     protected $mediaDir;
 
     /**
-     * @inheritdoc
+     * Initialize testable object
      */
     protected function setUp(): void
     {
@@ -92,21 +92,17 @@ class FaviconTest extends TestCase
     }
 
     /**
-     * cover negative case for getFaviconFile.
-     *
-     * @return void
+     * cover negative case for getFaviconFile
      */
-    public function testGetFaviconFileNegative(): void
+    public function testGetFaviconFileNegative()
     {
         $this->assertFalse($this->object->getFaviconFile());
     }
 
     /**
-     * cover positive case for getFaviconFile and checkIsFile.
-     *
-     * @return void
+     * cover positive case for getFaviconFile and checkIsFile
      */
-    public function testGetFaviconFile(): void
+    public function testGetFaviconFile()
     {
         $scopeConfigValue = 'path';
         $urlToMediaDir = 'http://magento.url/media/';
@@ -127,10 +123,14 @@ class FaviconTest extends TestCase
         $this->fileStorageDatabase->expects($this->once())
             ->method('saveFileToFilesystem')
             ->willReturn(true);
-        $this->mediaDir
+        $this->mediaDir->expects($this->at(0))
             ->method('isFile')
-            ->withConsecutive([$expectedFile], [$expectedFile])
-            ->willReturnOnConsecutiveCalls(false, true);
+            ->with($expectedFile)
+            ->willReturn(false);
+        $this->mediaDir->expects($this->at(1))
+            ->method('isFile')
+            ->with($expectedFile)
+            ->willReturn(true);
 
         $results = $this->object->getFaviconFile();
         $this->assertEquals(
@@ -141,11 +141,9 @@ class FaviconTest extends TestCase
     }
 
     /**
-     * cover getDefaultFavicon.
-     *
-     * @return void
+     * cover getDefaultFavicon
      */
-    public function testGetDefaultFavicon(): void
+    public function testGetDefaultFavicon()
     {
         $this->assertEquals('Magento_Theme::favicon.ico', $this->object->getDefaultFavicon());
     }
